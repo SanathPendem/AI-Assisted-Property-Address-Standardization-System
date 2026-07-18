@@ -1,0 +1,27 @@
+{
+  "table2": {
+    "rows_loaded": 16105,
+    "exact_duplicates_dropped": 258,
+    "sentinel_or_out_of_state_rows_dropped": 3,
+    "rows_kept": 15844,
+    "note": "address column treated as ground-truth canonical (already human-clean); noisy raw counterpart is synthetically generated."
+  },
+  "table1": {
+    "rows_loaded": 155453,
+    "exact_duplicates_dropped": 44876,
+    "rows_missing_street_name_dropped": 30,
+    "rows_with_unusable_house_number_dropped": 5710,
+    "rows_kept": 104837,
+    "rows_missing_zip5_kept_anyway": 24499,
+    "note": "No city/state in source. City is IMPUTED via table2's zip->city / county->city lookup (state assumed 'NY'). This is an assumption, not verified ground truth -- treat table1-derived canonicals as weaker labels."
+  },
+  "pairs": {
+    "table1_positive_pairs": 104837,
+    "table2_positive_pairs": 15844,
+    "negative_pairs": 18102,
+    "total_pairs": 138783,
+    "written_to_training_data_csv": 117966,
+    "written_to_validation_holdout_csv": 20817,
+    "holdout_fraction_requested": 0.15
+  }
+}

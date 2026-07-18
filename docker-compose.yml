@@ -1,0 +1,107 @@
+version: '3.9'
+
+services:
+  # ─── PostgreSQL with pgvector ───────────────────────────────────────────────
+  postgres:
+    image: pgvector/pgvector:pg15
+    container_name: addr_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-addruser}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-addrpass}
+      POSTGRES_DB: ${POSTGRES_DB:-address_db}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/migrations:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-addruser} -d ${POSTGRES_DB:-address_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ─── Redis (for Bull job queues) ────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: addr_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ─── Python ML Service (FastAPI) ────────────────────────────────────────────
+  ml-service:
+    build:
+      context: ./ml-service
+      dockerfile: Dockerfile
+    container_name: addr_ml_service
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-addruser}:${POSTGRES_PASSWORD:-addrpass}@postgres:5432/${POSTGRES_DB:-address_db}
+      MODEL_PATH: /app/models/lgbm_model.pkl
+      EMBEDDING_MODEL: all-MiniLM-L6-v2
+      LOG_LEVEL: INFO
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./ml-service/models:/app/models
+      - ./ml-service/data:/app/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+
+  # ─── NestJS Backend ─────────────────────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: addr_backend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      DATABASE_USER: ${POSTGRES_USER:-addruser}
+      DATABASE_PASSWORD: ${POSTGRES_PASSWORD:-addrpass}
+      DATABASE_NAME: ${POSTGRES_DB:-address_db}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      ML_SERVICE_URL: http://ml-service:8000
+      AUTO_ACCEPT_THRESHOLD: ${AUTO_ACCEPT_THRESHOLD:-0.80}
+      REVIEW_THRESHOLD: ${REVIEW_THRESHOLD:-0.50}
+      RETRAIN_TRIGGER_COUNT: ${RETRAIN_TRIGGER_COUNT:-50}
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      ml-service:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  default:
+    name: addr_network
