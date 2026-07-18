@@ -15,14 +15,14 @@ export class ReviewQueue {
   @JoinColumn({ name: 'standardization_id' })
   standardizationResult: StandardizationResult;
 
-  @Column({ name: 'standardization_id' })
+  @Column({ name: 'standardization_id', type: 'uuid' })
   standardizationId: string;
 
   @ManyToOne(() => RawAddress, (r) => r.reviewQueueItems)
   @JoinColumn({ name: 'raw_address_id' })
   rawAddress: RawAddress;
 
-  @Column({ name: 'raw_address_id' })
+  @Column({ name: 'raw_address_id', type: 'uuid' })
   rawAddressId: string;
 
   @Column({ name: 'raw_address_text', type: 'text' })
@@ -43,7 +43,7 @@ export class ReviewQueue {
   @Column({ name: 'review_status', type: 'enum', enum: ['pending', 'accepted', 'corrected', 'rejected', 'escalated'], default: 'pending' })
   reviewStatus: string;
 
-  @Column({ name: 'reviewer_id', nullable: true })
+  @Column({ name: 'reviewer_id', type: 'varchar', nullable: true })
   reviewerId?: string | null;
 
   @Column({ name: 'reviewed_at', type: 'timestamptz', nullable: true })

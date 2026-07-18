@@ -14,14 +14,14 @@ export class Feedback {
   @JoinColumn({ name: 'review_queue_id' })
   reviewQueueItem?: ReviewQueue | null;
 
-  @Column({ name: 'review_queue_id', nullable: true })
+  @Column({ name: 'review_queue_id', type: 'uuid', nullable: true })
   reviewQueueId?: string | null;
 
   @ManyToOne(() => RawAddress, (r) => r.feedbackItems)
   @JoinColumn({ name: 'raw_address_id' })
   rawAddress: RawAddress;
 
-  @Column({ name: 'raw_address_id' })
+  @Column({ name: 'raw_address_id', type: 'uuid' })
   rawAddressId: string;
 
   @Column({ name: 'raw_address_text', type: 'text' })
@@ -36,16 +36,16 @@ export class Feedback {
   @Column({ name: 'corrected_address', type: 'text', nullable: true })
   correctedAddress?: string | null;
 
-  @Column({ name: 'reviewer_id' })
+  @Column({ name: 'reviewer_id', type: 'varchar' })
   reviewerId: string;
 
   @Column({ type: 'text', nullable: true })
   rationale?: string | null;
 
-  @Column({ name: 'used_in_training', default: false })
+  @Column({ name: 'used_in_training', type: 'boolean', default: false })
   usedInTraining: boolean;
 
-  @Column({ name: 'training_batch_id', nullable: true })
+  @Column({ name: 'training_batch_id', type: 'varchar', nullable: true })
   trainingBatchId?: string | null;
 
   @CreateDateColumn({ name: 'created_at' })

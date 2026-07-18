@@ -9,14 +9,14 @@ export class AuditTrail {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ name: 'event_type' })
+  @Column({ name: 'event_type', type: 'varchar' })
   eventType: string;
 
   @ManyToOne(() => RawAddress, (r) => r.auditTrailEntries, { nullable: true })
   @JoinColumn({ name: 'raw_address_id' })
   rawAddress?: RawAddress | null;
 
-  @Column({ name: 'raw_address_id', nullable: true })
+  @Column({ name: 'raw_address_id', type: 'uuid', nullable: true })
   rawAddressId?: string | null;
 
   @Column({ name: 'raw_address_text', type: 'text', nullable: true })
@@ -40,10 +40,10 @@ export class AuditTrail {
   @Column({ name: 'human_rationale', type: 'text', nullable: true })
   humanRationale?: string | null;
 
-  @Column({ name: 'reviewer_id', nullable: true })
+  @Column({ name: 'reviewer_id', type: 'varchar', nullable: true })
   reviewerId?: string | null;
 
-  @Column({ name: 'model_version', nullable: true })
+  @Column({ name: 'model_version', type: 'varchar', nullable: true })
   modelVersion?: string | null;
 
   @Column({ type: 'jsonb', nullable: true })

@@ -15,14 +15,14 @@ export class StandardizationResult {
   @JoinColumn({ name: 'raw_address_id' })
   rawAddress: RawAddress;
 
-  @Column({ name: 'raw_address_id' })
+  @Column({ name: 'raw_address_id', type: 'uuid' })
   rawAddressId: string;
 
   @ManyToOne(() => CanonicalAddress, (c) => c.standardizationResults, { nullable: true })
   @JoinColumn({ name: 'canonical_id' })
   canonical?: CanonicalAddress | null;
 
-  @Column({ name: 'canonical_id', nullable: true })
+  @Column({ name: 'canonical_id', type: 'uuid', nullable: true })
   canonicalId?: string | null;
 
   @Column({ name: 'predicted_address', type: 'text' })
@@ -37,10 +37,10 @@ export class StandardizationResult {
   @Column({ name: 'feature_vector', type: 'jsonb', nullable: true })
   featureVector?: Record<string, any> | null;
 
-  @Column({ name: 'model_version', nullable: true })
+  @Column({ name: 'model_version', type: 'varchar', nullable: true })
   modelVersion?: string | null;
 
-  @Column({ name: 'processing_time_ms', nullable: true })
+  @Column({ name: 'processing_time_ms', type: 'integer', nullable: true })
   processingTimeMs?: number | null;
 
   @CreateDateColumn({ name: 'created_at' })
