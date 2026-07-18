@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Address Standardization System — Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #0B0F19;
+      --bg-card: rgba(18, 24, 38, 0.75);
+      --bg-card-hover: rgba(28, 36, 56, 0.85);
+      --border-color: rgba(255, 255, 255, 0.08);
+      --border-highlight: rgba(99, 102, 241, 0.3);
+      --primary: #6366F1;
+      --primary-hover: #4F46E5;
+      --primary-glow: rgba(99, 102, 241, 0.25);
+      --success: #10B981;
+      --success-glow: rgba(16, 185, 129, 0.2);
+      --warning: #F59E0B;
+      --warning-glow: rgba(245, 158, 11, 0.2);
+      --danger: #EF4444;
+      --danger-glow: rgba(239, 68, 68, 0.2);
+      --text-main: #F8FAFC;
+      --text-muted: #94A3B8;
+      --text-dim: #64748B;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg-dark);
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.12) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.08) 0px, transparent 50%);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      border-bottom: 1px solid var(--border-color);
+      backdrop-filter: blur(12px);
+      background: rgba(11, 15, 25, 0.8);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .header-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo-group {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--primary), #8B5CF6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1.2rem;
+      color: white;
+      box-shadow: 0 0 15px var(--primary-glow);
+    }
+
+    .logo-text h1 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      background: linear-gradient(to right, #FFF, #94A3B8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .logo-text p {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 0.5rem;
+      background: rgba(255, 255, 255, 0.03);
+      padding: 4px;
+      border-radius: 10px;
+      border: 1px solid var(--border-color);
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 0.5rem 1.25rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .tab-btn:hover {
+      color: var(--text-main);
+    }
+
+    .tab-btn.active {
+      background: var(--primary);
+      color: white;
+      box-shadow: 0 2px 8px var(--primary-glow);
+    }
+
+    .status-badge {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      padding: 0.4rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      color: var(--success);
+      font-weight: 600;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--success);
+      box-shadow: 0 0 8px var(--success);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.2); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    main {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem;
+      flex: 1;
+      width: 100%;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    /* Grid layout for Workbench */
+    .grid-workbench {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 968px) {
+      .grid-workbench {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 1.5rem;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.25rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .card-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    textarea, input[type="text"] {
+      width: 100%;
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 0.85rem 1rem;
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 0.95rem;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    textarea:focus, input[type="text"]:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 12px var(--primary-glow);
+    }
+
+    .sample-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .pill {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      padding: 0.35rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .pill:hover {
+      background: rgba(99, 102, 241, 0.15);
+      border-color: var(--primary);
+      color: var(--text-main);
+    }
+
+    .btn-primary {
+      width: 100%;
+      background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+      color: white;
+      border: none;
+      padding: 0.85rem 1.5rem;
+      font-size: 0.95rem;
+      font-weight: 700;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      box-shadow: 0 4px 14px var(--primary-glow);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px var(--primary-glow);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    /* Result Panel */
+    .empty-result {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 4rem 2rem;
+      color: var(--text-dim);
+      text-align: center;
+    }
+
+    .score-meter {
+      background: rgba(15, 23, 42, 0.8);
+      border-radius: 12px;
+      padding: 1.25rem;
+      margin-bottom: 1.25rem;
+      border: 1px solid var(--border-color);
+    }
+
+    .score-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .score-val {
+      font-size: 1.75rem;
+      font-weight: 800;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .score-bar-bg {
+      height: 8px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .score-bar-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .badge-decision {
+      padding: 0.35rem 0.85rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .decision-auto_accepted {
+      background: var(--success-glow);
+      color: var(--success);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .decision-pending_review {
+      background: var(--warning-glow);
+      color: var(--warning);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+
+    .decision-flagged {
+      background: var(--danger-glow);
+      color: var(--danger);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .output-box {
+      background: rgba(15, 23, 42, 0.8);
+      border-radius: 10px;
+      padding: 1rem;
+      border: 1px solid var(--border-color);
+      margin-bottom: 1rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.9rem;
+      color: var(--success);
+    }
+
+    .component-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+
+    .comp-card {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border-color);
+      padding: 0.6rem 0.8rem;
+      border-radius: 8px;
+    }
+
+    .comp-label {
+      font-size: 0.68rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+    }
+
+    .comp-value {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-main);
+      margin-top: 0.2rem;
+      word-break: break-word;
+    }
+
+    /* Table styles for Review Queue & Audit */
+    .table-container {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.88rem;
+    }
+
+    th {
+      background: rgba(255, 255, 255, 0.02);
+      color: var(--text-muted);
+      font-weight: 600;
+      padding: 1rem;
+      border-bottom: 1px solid var(--border-color);
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      letter-spacing: 0.05em;
+    }
+
+    td {
+      padding: 1rem;
+      border-bottom: 1px solid var(--border-color);
+      color: var(--text-main);
+    }
+
+    tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .action-btns {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .btn-sm {
+      padding: 0.35rem 0.75rem;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-accept { background: rgba(16, 185, 129, 0.2); color: var(--success); }
+    .btn-accept:hover { background: var(--success); color: white; }
+
+    .btn-correct { background: rgba(245, 158, 11, 0.2); color: var(--warning); }
+    .btn-correct:hover { background: var(--warning); color: white; }
+
+    .btn-reject { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
+    .btn-reject:hover { background: var(--danger); color: white; }
+
+    footer {
+      border-top: 1px solid var(--border-color);
+      padding: 1rem 2rem;
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--text-dim);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-container">
+      <div class="logo-group">
+        <div class="logo-icon">AI</div>
+        <div class="logo-text">
+          <h1>Address Standardization</h1>
+          <p>Production ML Pipeline & Human-in-the-Loop Validation</p>
+        </div>
+      </div>
+
+      <nav class="nav-tabs">
+        <button class="tab-btn active" onclick="switchTab('workbench')">⚡ Workbench</button>
+        <button class="tab-btn" onclick="switchTab('review')">📋 Review Queue</button>
+        <button class="tab-btn" onclick="switchTab('audit')">📜 Audit Trail</button>
+        <button class="tab-btn" onclick="switchTab('ml')">🤖 ML Status</button>
+      </nav>
+
+      <div class="status-badge">
+        <div class="status-dot"></div>
+        System Active
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- TAB 1: WORKBENCH -->
+    <div id="tab-workbench" class="tab-content active">
+      <div class="grid-workbench">
+        <!-- Input Form -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <span>✍️</span> Raw Address Ingestion
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Select Sample Preset</label>
+            <div class="sample-pills">
+              <div class="pill" onclick="setPreset('45 W 34 St Apt 2, NY 12308')">45 W 34 St Apt 2, NY</div>
+              <div class="pill" onclick="setPreset('100 main street, suite 400, austin tx 78701')">100 Main St Suite 400</div>
+              <div class="pill" onclick="setPreset('742 evergreen terr sprngfld or 97477')">742 Evergreen Terr</div>
+              <div class="pill" onclick="setPreset('p.o. box 1234, san francisco ca')">PO Box 1234, SF</div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="rawAddress">Raw Property Address String</label>
+            <textarea id="rawAddress" rows="4" placeholder="Enter messy property address string... e.g., 45 W 34 St Apt 2, NY 12308"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="sourceSystem">Source System Identifier</label>
+            <input type="text" id="sourceSystem" value="property_db">
+          </div>
+
+          <button id="btnStandardize" class="btn-primary" onclick="standardizeAddress()">
+            <span>✨ Run AI Standardization</span>
+          </button>
+        </div>
+
+        <!-- Output Result Panel -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <span>🎯</span> Standardization Output
+            </div>
+            <span id="procTime" style="font-size:0.78rem; color:var(--text-dim);"></span>
+          </div>
+
+          <div id="resultContainer">
+            <div class="empty-result">
+              <span style="font-size: 2.5rem; margin-bottom: 0.5rem; opacity: 0.4;">🚀</span>
+              <p>Enter a raw address and click <b>Run AI Standardization</b> to see confidence scores and canonical formatting.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: REVIEW QUEUE -->
+    <div id="tab-review" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <span>📋</span> Human-in-the-Loop Review Queue
+          </div>
+          <button class="btn-sm" style="background:rgba(255,255,255,0.05); color:var(--text-muted);" onclick="loadReviewQueue()">🔄 Refresh Queue</button>
+        </div>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Priority</th>
+                <th>Raw Input</th>
+                <th>ML Prediction</th>
+                <th>Confidence</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="reviewTableBody">
+              <tr><td colspan="6" style="text-align:center; color:var(--text-dim);">Loading review queue...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: AUDIT TRAIL -->
+    <div id="tab-audit" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <span>📜</span> System Audit Trail
+          </div>
+          <button class="btn-sm" style="background:rgba(255,255,255,0.05); color:var(--text-muted);" onclick="loadAuditTrail()">🔄 Refresh Trail</button>
+        </div>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Event</th>
+                <th>Raw Address</th>
+                <th>Predicted Address</th>
+                <th>Final Address</th>
+                <th>Score</th>
+                <th>Timestamp</th>
+              </tr>
+            </thead>
+            <tbody id="auditTableBody">
+              <tr><td colspan="6" style="text-align:center; color:var(--text-dim);">Loading audit trail...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: ML STATUS -->
+    <div id="tab-ml" class="tab-content">
+      <div class="grid-workbench">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <span>🤖</span> Active Model Metrics
+            </div>
+          </div>
+
+          <div id="mlMetricsContainer">
+            <div class="score-meter">
+              <div class="score-header">
+                <span style="font-size:0.85rem; color:var(--text-muted);">Model Version</span>
+                <span class="score-val" style="font-size:1.1rem; color:var(--primary);">v1.0.0-lgbm</span>
+              </div>
+            </div>
+
+            <div class="component-grid">
+              <div class="comp-card">
+                <div class="comp-label">Accuracy</div>
+                <div class="comp-value" style="color:var(--success);">87.5%</div>
+              </div>
+              <div class="comp-card">
+                <div class="comp-label">Precision</div>
+                <div class="comp-value" style="color:var(--primary);">89.2%</div>
+              </div>
+              <div class="comp-card">
+                <div class="comp-label">Recall</div>
+                <div class="comp-value" style="color:var(--warning);">85.1%</div>
+              </div>
+              <div class="comp-card">
+                <div class="comp-label">Retrain Trigger</div>
+                <div class="comp-value">50 Feedback</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <span>🔄</span> Manual Model Retraining
+            </div>
+          </div>
+          <p style="font-size:0.88rem; color:var(--text-muted); margin-bottom:1.25rem; line-height:1.5;">
+            Triggers a manual training iteration using accumulated human feedback corrections to update the LightGBM decision boundaries.
+          </p>
+          <button class="btn-primary" style="background:linear-gradient(135deg, #10B981, #059669);" onclick="triggerRetrain()">
+            <span>⚡ Trigger Model Retrain</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <p>AI-Assisted Property Address Standardization System &bull; NestJS + FastAPI + LightGBM + PostgreSQL (pgvector)</p>
+  </footer>
+
+  <script>
+    const API_BASE = 'http://localhost:3000';
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+      event.target.classList.add('active');
+      document.getElementById('tab-' + tabId).classList.add('active');
+
+      if (tabId === 'review') loadReviewQueue();
+      if (tabId === 'audit') loadAuditTrail();
+    }
+
+    function setPreset(text) {
+      document.getElementById('rawAddress').value = text;
+    }
+
+    async function standardizeAddress() {
+      const rawAddress = document.getElementById('rawAddress').value.trim();
+      const sourceSystem = document.getElementById('sourceSystem').value.trim() || 'property_db';
+      const btn = document.getElementById('btnStandardize');
+      const resContainer = document.getElementById('resultContainer');
+
+      if (!rawAddress) {
+        alert('Please enter a raw address');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = '<span>⏳ Processing Pipeline...</span>';
+
+      try {
+        const response = await fetch(`${API_BASE}/addresses/standardize`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            rawAddress,
+            sourceSystem,
+            sourceRecordId: 'WEB-' + Date.now()
+          })
+        });
+
+        const data = await response.json();
+        btn.disabled = false;
+        btn.innerHTML = '<span>✨ Run AI Standardization</span>';
+
+        renderResult(data);
+      } catch (err) {
+        btn.disabled = false;
+        btn.innerHTML = '<span>✨ Run AI Standardization</span>';
+        alert('Error standardizing address: ' + err.message);
+      }
+    }
+
+    function renderResult(data) {
+      const resContainer = document.getElementById('resultContainer');
+      document.getElementById('procTime').innerText = `Execution: ${data.processingTimeMs || 0} ms`;
+
+      const scorePct = Math.round((data.confidenceScore || 0) * 100);
+      let scoreColor = '#10B981';
+      if (data.routingDecision === 'pending_review') scoreColor = '#F59E0B';
+      if (data.routingDecision === 'flagged') scoreColor = '#EF4444';
+
+      const canonicals = data.canonicalComponents || {};
+
+      let compHtml = '';
+      for (const [k, v] of Object.entries(canonicals)) {
+        if (v) {
+          compHtml += `
+            <div class="comp-card">
+              <div class="comp-label">${k.replace('_', ' ')}</div>
+              <div class="comp-value">${v}</div>
+            </div>
+          `;
+        }
+      }
+
+      resContainer.innerHTML = `
+        <div class="score-meter">
+          <div class="score-header">
+            <div>
+              <span style="font-size:0.8rem; color:var(--text-muted); text-transform:uppercase;">ML Confidence Score</span>
+              <div class="score-val" style="color:${scoreColor}">${scorePct}%</div>
+            </div>
+            <span class="badge-decision decision-${data.routingDecision}">${data.routingDecision.replace('_', ' ')}</span>
+          </div>
+          <div class="score-bar-bg">
+            <div class="score-bar-fill" style="width:${scorePct}%; background:${scoreColor}"></div>
+          </div>
+        </div>
+
+        <label>Canonical Standardized Output</label>
+        <div class="output-box">${data.standardizedAddress}</div>
+
+        <label>Parsed Components Breakdown</label>
+        <div class="component-grid">${compHtml || '<p style="font-size:0.8rem; color:var(--text-dim);">No components parsed</p>'}</div>
+      `;
+    }
+
+    async function loadReviewQueue() {
+      const tbody = document.getElementById('reviewTableBody');
+      try {
+        const response = await fetch(`${API_BASE}/review/queue?status=pending`);
+        const data = await response.json();
+        
+        if (!data.items || data.items.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:var(--text-dim); padding:2rem;">🎉 Queue is empty! No pending items for review.</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = data.items.map(item => `
+          <tr>
+            <td><b style="color:var(--primary)">${Math.round((item.priorityScore || 0) * 100)}%</b></td>
+            <td style="max-width:200px; word-break:break-word;">${item.rawAddressText}</td>
+            <td style="max-width:200px; word-break:break-word; color:var(--success)">${item.predictedAddress}</td>
+            <td><b>${Math.round((item.confidenceScore || 0) * 100)}%</b></td>
+            <td><span class="badge-decision decision-${item.routingDecision}">${item.routingDecision}</span></td>
+            <td>
+              <div class="action-btns">
+                <button class="btn-sm btn-accept" onclick="submitDecision('${item.id}', 'accepted')">Accept</button>
+                <button class="btn-sm btn-correct" onclick="submitDecision('${item.id}', 'corrected')">Correct</button>
+                <button class="btn-sm btn-reject" onclick="submitDecision('${item.id}', 'rejected')">Reject</button>
+              </div>
+            </td>
+          </tr>
+        `).join('');
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="6" style="color:var(--danger)">Failed to load queue: ${err.message}</td></tr>`;
+      }
+    }
+
+    async function submitDecision(id, decision) {
+      let correctedAddress = null;
+      if (decision === 'corrected') {
+        correctedAddress = prompt('Enter corrected canonical address:');
+        if (!correctedAddress) return;
+      }
+
+      try {
+        const response = await fetch(`${API_BASE}/review/${id}/decide`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            decision,
+            correctedAddress,
+            reviewerId: 'reviewer-web-ui',
+            rationale: 'Validated via Web Dashboard'
+          })
+        });
+
+        if (response.ok) {
+          alert('Decision saved successfully!');
+          loadReviewQueue();
+        } else {
+          alert('Error saving decision');
+        }
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
+    async function loadAuditTrail() {
+      const tbody = document.getElementById('auditTableBody');
+      try {
+        const response = await fetch(`${API_BASE}/audit`);
+        const data = await response.json();
+        
+        if (!data.items || data.items.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:var(--text-dim); padding:2rem;">No audit entries recorded yet.</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = data.items.map(item => `
+          <tr>
+            <td><span style="font-weight:700; color:var(--primary);">${item.eventType}</span></td>
+            <td style="max-width:180px; word-break:break-word;">${item.rawAddressText || '-'}</td>
+            <td style="max-width:180px; word-break:break-word;">${item.predictedAddress || '-'}</td>
+            <td style="max-width:180px; word-break:break-word; color:var(--success);">${item.finalAddress || '-'}</td>
+            <td><b>${item.confidenceScore ? Math.round(item.confidenceScore * 100) + '%' : '-'}</b></td>
+            <td style="font-size:0.75rem; color:var(--text-dim);">${new Date(item.createdAt).toLocaleString()}</td>
+          </tr>
+        `).join('');
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="6" style="color:var(--danger)">Failed to load audit trail: ${err.message}</td></tr>`;
+      }
+    }
+
+    async function triggerRetrain() {
+      try {
+        const response = await fetch(`${API_BASE}/ml/retrain`, { method: 'POST' });
+        const data = await response.json();
+        alert('Model Retrain Triggered: ' + JSON.stringify(data));
+      } catch (err) {
+        alert('Error triggering retrain: ' + err.message);
+      }
+    }
+  </script>
+</body>
+</html>
