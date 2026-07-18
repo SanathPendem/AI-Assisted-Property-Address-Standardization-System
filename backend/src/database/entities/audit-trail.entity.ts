@@ -14,40 +14,40 @@ export class AuditTrail {
 
   @ManyToOne(() => RawAddress, (r) => r.auditTrailEntries, { nullable: true })
   @JoinColumn({ name: 'raw_address_id' })
-  rawAddress: RawAddress;
+  rawAddress?: RawAddress | null;
 
   @Column({ name: 'raw_address_id', nullable: true })
-  rawAddressId: string;
+  rawAddressId?: string | null;
 
   @Column({ name: 'raw_address_text', type: 'text', nullable: true })
-  rawAddressText: string;
+  rawAddressText?: string | null;
 
   @Column({ name: 'predicted_address', type: 'text', nullable: true })
-  predictedAddress: string;
+  predictedAddress?: string | null;
 
   @Column({ name: 'final_address', type: 'text', nullable: true })
-  finalAddress: string;
+  finalAddress?: string | null;
 
   @Column({ name: 'confidence_score', type: 'numeric', precision: 5, scale: 4, nullable: true })
-  confidenceScore: number;
+  confidenceScore?: number | null;
 
   @Column({ name: 'routing_decision', type: 'enum', enum: ['auto_accepted', 'pending_review', 'flagged'], nullable: true })
-  routingDecision: string;
+  routingDecision?: string | null;
 
   @Column({ name: 'human_decision', type: 'enum', enum: ['accepted', 'corrected', 'rejected'], nullable: true })
-  humanDecision: string;
+  humanDecision?: string | null;
 
   @Column({ name: 'human_rationale', type: 'text', nullable: true })
-  humanRationale: string;
+  humanRationale?: string | null;
 
   @Column({ name: 'reviewer_id', nullable: true })
-  reviewerId: string;
+  reviewerId?: string | null;
 
   @Column({ name: 'model_version', nullable: true })
-  modelVersion: string;
+  modelVersion?: string | null;
 
   @Column({ type: 'jsonb', nullable: true })
-  metadata: Record<string, any>;
+  metadata?: Record<string, any> | null;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

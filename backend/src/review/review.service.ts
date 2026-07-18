@@ -33,7 +33,8 @@ export class ReviewService {
   ) {}
 
   async getQueue(pagination: PaginationDto, status = 'pending') {
-    const { page, limit } = pagination;
+    const page = pagination?.page ?? 1;
+    const limit = pagination?.limit ?? 10;
     const [items, total] = await this.reviewRepo.findAndCount({
       where: { reviewStatus: status },
       relations: ['rawAddress', 'standardizationResult'],
@@ -142,7 +143,7 @@ export class ReviewService {
 
   private async findOrCreateCanonicalFromText(addressText: string): Promise<CanonicalAddress> {
     // Attempt standard parse to construct components if possible, or fallback to simple insert
-    let mlResult = null;
+    let mlResult: any = null;
     try {
       mlResult = await this.mlClient.standardize(addressText);
     } catch (e) {

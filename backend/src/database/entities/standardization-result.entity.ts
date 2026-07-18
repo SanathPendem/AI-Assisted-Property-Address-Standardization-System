@@ -20,10 +20,10 @@ export class StandardizationResult {
 
   @ManyToOne(() => CanonicalAddress, (c) => c.standardizationResults, { nullable: true })
   @JoinColumn({ name: 'canonical_id' })
-  canonical: CanonicalAddress;
+  canonical?: CanonicalAddress | null;
 
   @Column({ name: 'canonical_id', nullable: true })
-  canonicalId: string;
+  canonicalId?: string | null;
 
   @Column({ name: 'predicted_address', type: 'text' })
   predictedAddress: string;
@@ -35,13 +35,13 @@ export class StandardizationResult {
   routingDecision: string;
 
   @Column({ name: 'feature_vector', type: 'jsonb', nullable: true })
-  featureVector: Record<string, any>;
+  featureVector?: Record<string, any> | null;
 
   @Column({ name: 'model_version', nullable: true })
-  modelVersion: string;
+  modelVersion?: string | null;
 
   @Column({ name: 'processing_time_ms', nullable: true })
-  processingTimeMs: number;
+  processingTimeMs?: number | null;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

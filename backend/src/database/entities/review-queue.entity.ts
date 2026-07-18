@@ -44,16 +44,16 @@ export class ReviewQueue {
   reviewStatus: string;
 
   @Column({ name: 'reviewer_id', nullable: true })
-  reviewerId: string;
+  reviewerId?: string | null;
 
   @Column({ name: 'reviewed_at', type: 'timestamptz', nullable: true })
-  reviewedAt: Date;
+  reviewedAt?: Date | null;
 
   @Column({ name: 'similar_canonicals', type: 'jsonb', nullable: true })
-  similarCanonicals: any[];
+  similarCanonicals?: any[] | null;
 
   @Column({ name: 'context_notes', type: 'text', nullable: true })
-  contextNotes: string;
+  contextNotes?: string | null;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

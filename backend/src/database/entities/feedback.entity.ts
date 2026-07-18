@@ -12,10 +12,10 @@ export class Feedback {
 
   @ManyToOne(() => ReviewQueue, (r) => r.feedbackItems, { nullable: true })
   @JoinColumn({ name: 'review_queue_id' })
-  reviewQueueItem: ReviewQueue;
+  reviewQueueItem?: ReviewQueue | null;
 
   @Column({ name: 'review_queue_id', nullable: true })
-  reviewQueueId: string;
+  reviewQueueId?: string | null;
 
   @ManyToOne(() => RawAddress, (r) => r.feedbackItems)
   @JoinColumn({ name: 'raw_address_id' })
@@ -34,19 +34,19 @@ export class Feedback {
   humanDecision: string;
 
   @Column({ name: 'corrected_address', type: 'text', nullable: true })
-  correctedAddress: string;
+  correctedAddress?: string | null;
 
   @Column({ name: 'reviewer_id' })
   reviewerId: string;
 
   @Column({ type: 'text', nullable: true })
-  rationale: string;
+  rationale?: string | null;
 
   @Column({ name: 'used_in_training', default: false })
   usedInTraining: boolean;
 
   @Column({ name: 'training_batch_id', nullable: true })
-  trainingBatchId: string;
+  trainingBatchId?: string | null;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

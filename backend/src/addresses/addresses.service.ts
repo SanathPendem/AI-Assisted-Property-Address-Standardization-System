@@ -189,7 +189,8 @@ export class AddressesService {
   }
 
   async findAll(pagination: PaginationDto) {
-    const { page, limit } = pagination;
+    const page = pagination?.page ?? 1;
+    const limit = pagination?.limit ?? 20;
     const [items, total] = await this.resultRepo.findAndCount({
       relations: ['rawAddress', 'canonical'],
       order: { createdAt: 'DESC' },

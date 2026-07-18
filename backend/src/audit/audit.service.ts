@@ -14,7 +14,9 @@ export class AuditService {
   ) {}
 
   async getAuditTrail(filter: AuditFilterDto) {
-    const { page, limit, eventType, startDate, endDate } = filter;
+    const page = filter?.page ?? 1;
+    const limit = filter?.limit ?? 20;
+    const { eventType, startDate, endDate } = filter;
 
     const query = this.auditRepo.createQueryBuilder('a')
       .leftJoinAndSelect('a.rawAddress', 'rawAddress')
